@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "code-review-graph": {
+      "command": "uvx",
+      "args": [
+        "code-review-graph",
+        "serve"
+      ]
+    },
+    "laravel-boost": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@laravel-boost/mcp-server@latest"
+      ]
+    }
+  }
+}

@@ -1,0 +1,419 @@
+<mxfile host="drawio-plugin" modified="2026-06-11T08:05:53.358Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" etag="Rzijg-m4bTA_gIzevSLy" version="22.1.22" type="embed" pages="4">
+  <diagram name="Overview" id="overview">
+    <mxGraphModel dx="1503" dy="667" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Drone Monitoring System — Architecture Overview" style="text;html=1;fontSize=16;fontStyle=1;align=center;" parent="1" vertex="1">
+          <mxGeometry x="500" y="20" width="800" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="sim" value="Drone Simulator&#xa;(php artisan simulate:telemetry)&#xa;HTTP POST every N sec" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=3;fontSize=11;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="80" y="400" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="laravel" value="Laravel Monolith&#xa;(Docker: app)" style="swimlane;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=3;fontSize=13;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="340" y="260" width="400" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="ctrl" value="TelemetryController&#xa;POST /api/telemetry" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;strokeWidth=2;fontSize=10;align=center;" parent="laravel" vertex="1">
+          <mxGeometry x="20" y="50" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="job1" value="ProcessTelemetryJob&#xa;(queued worker)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;strokeWidth=2;fontSize=10;align=center;" parent="laravel" vertex="1">
+          <mxGeometry x="210" y="50" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="job2" value="GenerateAlertJob&#xa;battery / geofence" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;strokeWidth=2;fontSize=10;align=center;" parent="laravel" vertex="1">
+          <mxGeometry x="20" y="145" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="event" value="TelemetryUpdated Event&#xa;(broadcast)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;strokeWidth=2;fontSize=10;align=center;" parent="laravel" vertex="1">
+          <mxGeometry x="210" y="145" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="filament" value="Filament Admin&#xa;/admin" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=10;align=center;" parent="laravel" vertex="1">
+          <mxGeometry x="20" y="245" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="blade" value="Blade + Leaflet.js&#xa;/map/{drone}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;fontSize=10;align=center;" parent="laravel" vertex="1">
+          <mxGeometry x="210" y="245" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="redis" value="Redis&#xa;(Docker: redis)&#xa;Queues + Cache + Pub/Sub" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=3;fontSize=11;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="340" y="700" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="mysql" value="MySQL&#xa;(Docker: db)&#xa;drones / telemetry_records / alerts" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=3;fontSize=11;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="560" y="700" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="reverb" value="Laravel Reverb&#xa;(Docker: reverb :8080)&#xa;WebSocket Server&#xa;Channel: drone.{id}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f4f8;strokeColor=#6c8ebf;strokeWidth=3;fontSize=11;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="840" y="370" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="nginx" value="Nginx&#xa;(Docker: nginx)&#xa;Reverse Proxy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;fontSize=11;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="840" y="260" width="180" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="clients" value="Browser Clients" style="swimlane;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=3;fontSize=13;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="1100" y="300" width="200" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="mappage" value="Live Map Page&#xa;Leaflet.js&#xa;marker updates" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;strokeWidth=2;fontSize=10;align=center;" parent="clients" vertex="1">
+          <mxGeometry x="20" y="45" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="adminpage" value="Filament Dashboard&#xa;Livewire + Alpine.js&#xa;alerts / history" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;strokeWidth=2;fontSize=10;align=center;" parent="clients" vertex="1">
+          <mxGeometry x="20" y="125" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="cicd" value="GitHub Actions CI/CD&#xa;test → lint → build&#xa;→ push GHCR → deploy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;fontSize=10;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="840" y="560" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" value="HTTP POST&#xa;/api/telemetry" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=3;strokeColor=#b85450;fontSize=10;html=1;" parent="1" source="sim" target="ctrl" edge="1">
+          <mxGeometry x="0.7966" y="65" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="445" y="470" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2" value="dispatch job" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#d6b656;dashed=1;fontSize=10;html=1;" parent="1" source="ctrl" target="redis" edge="1">
+          <mxGeometry x="0.3239" y="-50" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3" value="dequeue" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#d6b656;dashed=1;fontSize=10;html=1;" parent="1" source="redis" target="job1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" value="dispatch" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#6c8ebf;dashed=1;fontSize=10;html=1;" parent="1" source="job1" target="job2" edge="1">
+          <mxGeometry x="0.1999" y="-65" relative="1" as="geometry">
+            <mxPoint y="-5" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e5" value="fire event" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#6c8ebf;fontSize=10;html=1;" parent="1" source="job1" target="event" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" value="Eloquent ORM&#xa;write" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=3;strokeColor=#d6b656;fontSize=10;html=1;" parent="1" source="job1" target="mysql" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" value="insert alert" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#d6b656;fontSize=10;html=1;" parent="1" source="job2" target="mysql" edge="1">
+          <mxGeometry x="-0.0769" y="10" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e8" value="broadcast&#xa;via Redis pub/sub" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=3;strokeColor=#6c8ebf;fontSize=10;html=1;" parent="1" source="event" target="reverb" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" value="WebSocket push&#xa;drone.{id}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=3;strokeColor=#82b366;fontSize=10;html=1;" parent="1" source="reverb" target="clients" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" value="PHP-FPM proxy" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#666666;fontSize=10;html=1;" parent="1" source="nginx" target="laravel" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" value="WS upgrade&#xa;/app/*" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#666666;dashed=1;fontSize=10;html=1;" parent="1" source="nginx" target="reverb" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" value="HTTPS" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=3;strokeColor=#82b366;fontSize=10;html=1;" parent="1" source="clients" target="nginx" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" value="Eloquent reads" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#82b366;fontSize=10;html=1;" parent="1" source="filament" target="mysql" edge="1">
+          <mxGeometry x="0.1034" y="20" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="Data Flow" id="dataflow">
+    <mxGraphModel dx="1804" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="df_title" value="Drone Monitoring System — Telemetry Data Flow" style="text;html=1;fontSize=16;fontStyle=1;align=center;" parent="1" vertex="1">
+          <mxGeometry x="500" y="20" width="800" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="s1" value="1. Drone Simulator&#xa;POST /api/telemetry&#xa;{lat, lng, battery, speed}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=3;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="80" y="100" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s2" value="2. TelemetryController&#xa;Validate + dispatch&#xa;ProcessTelemetryJob" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=3;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="340" y="100" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s3" value="3. Redis Queue&#xa;Job queued&#xa;202 returned to client" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=3;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="600" y="100" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s4" value="4. ProcessTelemetryJob&#xa;Worker picks up job&#xa;(async, decoupled)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=3;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="860" y="100" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s5" value="5a. MySQL Write&#xa;UPDATE drones state&#xa;INSERT telemetry_records" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=3;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="1120" y="80" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s6" value="5b. GenerateAlertJob&#xa;Check battery &lt; 20%&#xa;Check geofence breach" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="1120" y="220" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s7" value="6. TelemetryUpdated Event&#xa;Broadcast fired&#xa;via Reverb / Redis pub" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=3;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="860" y="320" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s8" value="7. Reverb WebSocket&#xa;Pushes JSON to&#xa;channel drone.{id}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f4f8;strokeColor=#6c8ebf;strokeWidth=3;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="600" y="320" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s9" value="8. Live Map Page&#xa;JS updates Leaflet marker&#xa;position + battery badge" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=3;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="340" y="320" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s10" value="9. Filament Dashboard&#xa;Livewire re-renders&#xa;telemetry + alert tables" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=3;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="80" y="320" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s11" value="Alert stored&#xa;in MySQL alerts table&#xa;(if triggered)" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=2;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="1380" y="210" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="de1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=4;strokeColor=#b85450;html=1;" parent="1" source="s1" target="s2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="de2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=4;strokeColor=#d6b656;html=1;" parent="1" source="s2" target="s3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="de3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=4;strokeColor=#d6b656;html=1;" parent="1" source="s3" target="s4" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="de4" value="write DB" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=3;strokeColor=#d6b656;fontSize=10;html=1;" parent="1" source="s4" target="s5" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="de5" value="dispatch" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#b85450;dashed=1;fontSize=10;html=1;" parent="1" source="s4" target="s6" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="de6" value="fire event" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=3;strokeColor=#6c8ebf;fontSize=10;html=1;" parent="1" source="s4" target="s7" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="de7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=3;strokeColor=#6c8ebf;html=1;" parent="1" source="s7" target="s8" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="de8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=3;strokeColor=#82b366;html=1;" parent="1" source="s8" target="s9" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="de9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=3;strokeColor=#82b366;html=1;" parent="1" source="s8" target="s10" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="de10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#b85450;dashed=1;html=1;" parent="1" source="s6" target="s11" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="Database Design" id="dbdesign">
+    <mxGraphModel dx="1244" dy="552" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="db_title" value="Drone Monitoring System — Database Schema" style="text;html=1;fontSize=16;fontStyle=1;align=center;" parent="1" vertex="1">
+          <mxGeometry x="500" y="20" width="800" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="t_drones" value="drones" style="swimlane;startSize=30;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=3;fontSize=13;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="80" y="80" width="260" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="d1" value="🔑 id (PK, bigint)" style="text;html=1;fontSize=10;align=left;" parent="t_drones" vertex="1">
+          <mxGeometry x="10" y="38" width="240" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="d2" value="name (varchar)" style="text;html=1;fontSize=10;align=left;" parent="t_drones" vertex="1">
+          <mxGeometry x="10" y="60" width="240" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="d3" value="serial_number (varchar, unique)" style="text;html=1;fontSize=10;align=left;" parent="t_drones" vertex="1">
+          <mxGeometry x="10" y="82" width="240" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="d4" value="status (enum: active/inactive)" style="text;html=1;fontSize=10;align=left;" parent="t_drones" vertex="1">
+          <mxGeometry x="10" y="104" width="240" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="d5" value="current_lat (decimal 10,8)" style="text;html=1;fontSize=10;align=left;" parent="t_drones" vertex="1">
+          <mxGeometry x="10" y="126" width="240" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="d6" value="current_lng (decimal 11,8)" style="text;html=1;fontSize=10;align=left;" parent="t_drones" vertex="1">
+          <mxGeometry x="10" y="148" width="240" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="d7" value="current_battery (tinyint)" style="text;html=1;fontSize=10;align=left;" parent="t_drones" vertex="1">
+          <mxGeometry x="10" y="170" width="240" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="d8" value="current_altitude (float)" style="text;html=1;fontSize=10;align=left;" parent="t_drones" vertex="1">
+          <mxGeometry x="10" y="192" width="240" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="d9" value="last_seen_at (timestamp, idx)" style="text;html=1;fontSize=10;align=left;fontStyle=4;" parent="t_drones" vertex="1">
+          <mxGeometry x="10" y="214" width="240" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="d10" value="geofence_id (FK → geofences)" style="text;html=1;fontSize=10;align=left;" parent="t_drones" vertex="1">
+          <mxGeometry x="10" y="236" width="240" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="d11" value="created_at / updated_at" style="text;html=1;fontSize=10;align=left;" parent="t_drones" vertex="1">
+          <mxGeometry x="10" y="258" width="240" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="d_idx" value="📌 INDEX(status)" style="text;html=1;fontSize=10;align=left;fontStyle=1;" parent="t_drones" vertex="1">
+          <mxGeometry x="10" y="290" width="240" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="t_tel" value="telemetry_records" style="swimlane;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=3;fontSize=13;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="440" y="80" width="280" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="tr1" value="🔑 id (PK, bigint)" style="text;html=1;fontSize=10;align=left;" parent="t_tel" vertex="1">
+          <mxGeometry x="10" y="38" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="tr2" value="🔗 drone_id (FK → drones.id, idx)" style="text;html=1;fontSize=10;align=left;fontStyle=4;" parent="t_tel" vertex="1">
+          <mxGeometry x="10" y="60" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="tr3" value="lat (decimal 10,8)" style="text;html=1;fontSize=10;align=left;" parent="t_tel" vertex="1">
+          <mxGeometry x="10" y="82" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="tr4" value="lng (decimal 11,8)" style="text;html=1;fontSize=10;align=left;" parent="t_tel" vertex="1">
+          <mxGeometry x="10" y="104" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="tr5" value="altitude (float)" style="text;html=1;fontSize=10;align=left;" parent="t_tel" vertex="1">
+          <mxGeometry x="10" y="126" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="tr6" value="battery (tinyint 0-100)" style="text;html=1;fontSize=10;align=left;" parent="t_tel" vertex="1">
+          <mxGeometry x="10" y="148" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="tr7" value="speed (float, m/s)" style="text;html=1;fontSize=10;align=left;" parent="t_tel" vertex="1">
+          <mxGeometry x="10" y="170" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="tr8" value="heading (smallint 0-360)" style="text;html=1;fontSize=10;align=left;" parent="t_tel" vertex="1">
+          <mxGeometry x="10" y="192" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="tr9" value="created_at (timestamp, idx)" style="text;html=1;fontSize=10;align=left;fontStyle=4;" parent="t_tel" vertex="1">
+          <mxGeometry x="10" y="214" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="tr_idx" value="📌 INDEX(drone_id, created_at DESC)" style="text;html=1;fontSize=10;align=left;fontStyle=1;" parent="t_tel" vertex="1">
+          <mxGeometry x="10" y="258" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="tr_note" value="Append-only. Never updated." style="text;html=1;fontSize=10;align=left;fontStyle=2;" parent="t_tel" vertex="1">
+          <mxGeometry x="10" y="290" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="fk2" value="1:N" style="edgeStyle=entityRelationEdgeStyle;rounded=1;strokeWidth=3;strokeColor=#b85450;fontSize=11;fontStyle=1;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="t_tel" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-80" y="38" as="sourcePoint" />
+            <mxPoint x="490" y="38" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="480" y="53" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="t_alerts" value="alerts" style="swimlane;startSize=30;fillColor=#f8cecc;strokeColor=#b85450;strokeWidth=3;fontSize=13;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="820" y="80" width="280" height="330" as="geometry" />
+        </mxCell>
+        <mxCell id="al1" value="🔑 id (PK, bigint)" style="text;html=1;fontSize=10;align=left;" parent="t_alerts" vertex="1">
+          <mxGeometry x="10" y="38" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="al2" value="🔗 drone_id (FK → drones.id, idx)" style="text;html=1;fontSize=10;align=left;fontStyle=4;" parent="t_alerts" vertex="1">
+          <mxGeometry x="10" y="60" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="al3" value="type (enum: low_battery|geofence)" style="text;html=1;fontSize=10;align=left;" parent="t_alerts" vertex="1">
+          <mxGeometry x="10" y="82" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="al4" value="severity (enum: warning|critical)" style="text;html=1;fontSize=10;align=left;" parent="t_alerts" vertex="1">
+          <mxGeometry x="10" y="104" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="al5" value="message (text)" style="text;html=1;fontSize=10;align=left;" parent="t_alerts" vertex="1">
+          <mxGeometry x="10" y="126" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="al6" value="resolved_at (timestamp, nullable)" style="text;html=1;fontSize=10;align=left;" parent="t_alerts" vertex="1">
+          <mxGeometry x="10" y="148" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="al7" value="created_at (timestamp)" style="text;html=1;fontSize=10;align=left;" parent="t_alerts" vertex="1">
+          <mxGeometry x="10" y="170" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="al_idx1" value="📌 INDEX(drone_id, type, resolved_at)" style="text;html=1;fontSize=10;align=left;fontStyle=1;" parent="t_alerts" vertex="1">
+          <mxGeometry x="10" y="220" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="al_note" value="Sparse. Deduped by unresolved type." style="text;html=1;fontSize=10;align=left;fontStyle=2;" parent="t_alerts" vertex="1">
+          <mxGeometry x="10" y="258" width="260" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="t_geo" value="geofences" style="swimlane;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=3;fontSize=13;fontStyle=1;" parent="1" vertex="1">
+          <mxGeometry x="440" y="500" width="260" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="g1" value="🔑 id (PK, bigint)" style="text;html=1;fontSize=10;align=left;" parent="t_geo" vertex="1">
+          <mxGeometry x="10" y="38" width="240" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="g2" value="name (varchar)" style="text;html=1;fontSize=10;align=left;" parent="t_geo" vertex="1">
+          <mxGeometry x="10" y="60" width="240" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="g3" value="boundary (JSON polygon coords)" style="text;html=1;fontSize=10;align=left;" parent="t_geo" vertex="1">
+          <mxGeometry x="10" y="82" width="240" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="g4" value="center_lat / center_lng" style="text;html=1;fontSize=10;align=left;" parent="t_geo" vertex="1">
+          <mxGeometry x="10" y="104" width="240" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="g5" value="radius_meters (float)" style="text;html=1;fontSize=10;align=left;" parent="t_geo" vertex="1">
+          <mxGeometry x="10" y="126" width="240" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="fk1" value="1:N" style="edgeStyle=entityRelationEdgeStyle;rounded=1;strokeWidth=3;strokeColor=#82b366;fontSize=11;fontStyle=1;html=1;" parent="1" source="t_drones" target="t_tel" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk3" value="N:1" style="edgeStyle=entityRelationEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#d6b656;fontSize=11;fontStyle=1;html=1;" parent="1" source="t_drones" target="t_geo" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram name="Deployment" id="deployment">
+    <mxGraphModel dx="1804" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="dep_title" value="Drone Monitoring System — Docker Deployment" style="text;html=1;fontSize=16;fontStyle=1;align=center;" parent="1" vertex="1">
+          <mxGeometry x="500" y="20" width="800" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="compose" value="Docker Compose (docker-compose.yml)" style="swimlane;startSize=35;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=3;fontSize=13;fontStyle=1;dashed=1;" parent="1" vertex="1">
+          <mxGeometry x="80" y="80" width="1240" height="520" as="geometry" />
+        </mxCell>
+        <mxCell id="svc_nginx" value="nginx&#xa;Port: 80 / 443&#xa;Reverse proxy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;fontSize=11;" parent="compose" vertex="1">
+          <mxGeometry x="40" y="60" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="svc_app" value="app (Laravel)&#xa;PHP-FPM :9000&#xa;+ queue:work (supervisor)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=3;fontSize=11;" parent="compose" vertex="1">
+          <mxGeometry x="280" y="60" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="svc_reverb" value="reverb&#xa;php artisan reverb:start&#xa;Port: 8080 (WebSocket)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f4f8;strokeColor=#6c8ebf;strokeWidth=3;fontSize=11;" parent="compose" vertex="1">
+          <mxGeometry x="540" y="60" width="180" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="svc_redis" value="redis&#xa;Redis 7&#xa;Port: 6379 (internal)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=3;fontSize=11;" parent="compose" vertex="1">
+          <mxGeometry x="800" y="60" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="svc_db" value="db (MySQL 8)&#xa;Port: 3306 (internal)&#xa;Volume: mysql_data" style="shape=cylinder3;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=3;fontSize=11;" parent="compose" vertex="1">
+          <mxGeometry x="1020" y="50" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="vol1" value="📦 mysql_data (named volume)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=1;fontSize=10;dashed=1;" parent="compose" vertex="1">
+          <mxGeometry x="1020" y="180" width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="vol2" value="📦 storage (app storage)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=1;fontSize=10;dashed=1;" parent="compose" vertex="1">
+          <mxGeometry x="280" y="180" width="180" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="envnote" value=".env secrets → GitHub Secrets → Docker env_file&#xa;APP_KEY, DB_PASSWORD, REVERB_APP_SECRET" style="text;html=1;fontSize=10;align=left;fontStyle=2;" parent="compose" vertex="1">
+          <mxGeometry x="40" y="380" width="500" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cachenote" value="Entrypoint: php artisan config:cache&#xa;php artisan route:cache&#xa;php artisan migrate --force" style="text;html=1;fontSize=10;align=left;fontStyle=2;" parent="compose" vertex="1">
+          <mxGeometry x="40" y="430" width="400" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="dep_e1" value="PHP-FPM" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#666666;fontSize=10;html=1;" parent="compose" source="svc_nginx" target="svc_app" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dep_e2" value="WS :8080" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#6c8ebf;dashed=1;fontSize=10;html=1;" parent="compose" source="svc_nginx" target="svc_reverb" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dep_e3" value="Redis queue" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#d6b656;fontSize=10;html=1;" parent="compose" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="460" y="60" as="sourcePoint" />
+            <mxPoint x="800" y="60" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dep_e4" value="pub/sub" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#d6b656;dashed=1;fontSize=10;html=1;" parent="compose" source="svc_reverb" target="svc_redis" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dep_e5" value="Eloquent" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#d6b656;fontSize=10;html=1;" parent="compose" source="svc_app" target="svc_db" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="370" y="170" />
+              <mxPoint x="740" y="170" />
+              <mxPoint x="740" y="90" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dep_e6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=1;strokeColor=#d6b656;dashed=1;html=1;" parent="compose" source="svc_db" target="vol1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dep_e7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=1;strokeColor=#6c8ebf;dashed=1;html=1;" parent="compose" source="svc_app" target="vol2" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gh" value="GitHub Actions CI/CD&#xa;Push → test → lint → build&#xa;→ push GHCR → SSH deploy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="1400" y="200" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="internet" value="Internet&#xa;Browser Clients" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=3;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="80" y="660" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="inet_e" value="HTTPS :443" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=4;strokeColor=#82b366;fontSize=11;html=1;" parent="1" source="internet" target="svc_nginx" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gh_e" value="docker compose pull + up -d" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeWidth=2;strokeColor=#666666;dashed=1;fontSize=10;html=1;" parent="1" source="gh" target="compose" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
