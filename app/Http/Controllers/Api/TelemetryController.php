@@ -19,7 +19,7 @@ class TelemetryController extends Controller
 
         return response()->json([
             'message' => 'Telemetry accepted for processing',
-            'job_id'  => $jobId,
+            'job_id' => $jobId,
         ], 202);
     }
 }

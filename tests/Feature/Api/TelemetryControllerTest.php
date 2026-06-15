@@ -14,15 +14,15 @@ class TelemetryControllerTest extends TestCase
     private function validPayload(int $droneId): array
     {
         return [
-            'drone_id'        => $droneId,
-            'latitude'        => 40.7128,
-            'longitude'       => -74.0060,
-            'altitude'        => 50.5,
-            'battery_level'   => 85,
+            'drone_id' => $droneId,
+            'latitude' => 40.7128,
+            'longitude' => -74.0060,
+            'altitude' => 50.5,
+            'battery_level' => 85,
             'signal_strength' => 92,
-            'speed'           => 12.5,
-            'heading'         => 180.0,
-            'recorded_at'     => '2026-06-11T10:30:00+00:00',
+            'speed' => 12.5,
+            'heading' => 180.0,
+            'recorded_at' => '2026-06-11T10:30:00+00:00',
         ];
     }
 
@@ -40,8 +40,8 @@ class TelemetryControllerTest extends TestCase
     public function test_invalid_telemetry_returns_422(): void
     {
         $response = $this->postJson('/api/telemetry', [
-            'drone_id'  => null,
-            'latitude'  => 999,
+            'drone_id' => null,
+            'latitude' => 999,
             'longitude' => 'not-a-number',
         ]);
 
@@ -90,10 +90,10 @@ class TelemetryControllerTest extends TestCase
         $drone = Drone::factory()->create();
 
         $payload = [
-            'drone_id'    => $drone->id,
-            'latitude'    => 40.7128,
-            'longitude'   => -74.0060,
-            'altitude'    => 50.5,
+            'drone_id' => $drone->id,
+            'latitude' => 40.7128,
+            'longitude' => -74.0060,
+            'altitude' => 50.5,
             'battery_level' => 85,
             'recorded_at' => '2026-06-11T10:30:00+00:00',
         ];

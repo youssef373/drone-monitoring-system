@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Models;
 
+use App\Enums\DroneStatus;
+use App\Models\Alert;
 use App\Models\Drone;
 use App\Models\Geofence;
 use App\Models\TelemetryRecord;
-use App\Models\Alert;
-use App\Enums\DroneStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

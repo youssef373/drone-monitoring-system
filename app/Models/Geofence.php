@@ -39,7 +39,7 @@ class Geofence extends Model
 
     public function containsPoint(float $lat, float $lng): bool
     {
-        if (!$this->isCircle()) {
+        if (! $this->isCircle()) {
             return $this->containsPointInPolygon($lat, $lng);
         }
 
@@ -54,9 +54,8 @@ class Geofence extends Model
      *
      * @see https://en.wikipedia.org/wiki/Haversine_formula
      *
-     * @param float $lat Point latitude in decimal degrees
-     * @param float $lng Point longitude in decimal degrees
-     *
+     * @param  float  $lat  Point latitude in decimal degrees
+     * @param  float  $lng  Point longitude in decimal degrees
      * @return bool True if point is inside the circle, false otherwise
      */
     private function containsPointInCircle(float $lat, float $lng): bool
@@ -84,9 +83,8 @@ class Geofence extends Model
      *
      * @see https://en.wikipedia.org/wiki/Point_in_polygon#Ray_casting_algorithm
      *
-     * @param float $lat Point latitude in decimal degrees
-     * @param float $lng Point longitude in decimal degrees
-     *
+     * @param  float  $lat  Point latitude in decimal degrees
+     * @param  float  $lng  Point longitude in decimal degrees
      * @return bool True if point is inside the polygon, false otherwise
      */
     private function containsPointInPolygon(float $lat, float $lng): bool
@@ -107,7 +105,7 @@ class Geofence extends Model
 
             if ((($yi > $lat) != ($yj > $lat)) &&
                 ($lng < ($xj - $xi) * ($lat - $yi) / ($yj - $yi) + $xi)) {
-                $inside = !$inside;
+                $inside = ! $inside;
             }
         }
 
