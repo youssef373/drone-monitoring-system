@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTelemetryRequest;
+use App\Jobs\ProcessTelemetryJob;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 
@@ -13,9 +14,7 @@ class TelemetryController extends Controller
     {
         $jobId = Str::uuid()->toString();
 
-        // ProcessTelemetryJob is implemented in feature 004.
-        // Swap this closure dispatch once that feature is merged.
-        dispatch(fn () => null);
+        ProcessTelemetryJob::dispatch($request->validated());
 
         return response()->json([
             'message' => 'Telemetry accepted for processing',
