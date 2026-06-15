@@ -59,4 +59,22 @@ class Alert extends Model
     {
         return $query->where('type', $type);
     }
+
+    public static function hasUnresolvedForDrone(int $droneId, AlertType $type): bool
+    {
+        return self::where('drone_id', $droneId)
+            ->where('type', $type)
+            ->whereNull('resolved_at')
+            ->exists();
+    }
+
+    public static function createForDrone(int $droneId, AlertType $type, string $message, AlertSeverity $severity): self
+    {
+        return self::create([
+            'drone_id' => $droneId,
+            'type' => $type,
+            'message' => $message,
+            'severity' => $severity,
+        ]);
+    }
 }
