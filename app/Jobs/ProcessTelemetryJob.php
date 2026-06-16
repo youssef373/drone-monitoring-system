@@ -50,9 +50,7 @@ class ProcessTelemetryJob implements ShouldQueue
             'last_telemetry_at' => now(),
         ]);
 
-        if (class_exists(TelemetryUpdated::class)) {
-            event(new TelemetryUpdated($drone, $record));
-        }
+        event(new TelemetryUpdated($drone, $record));
 
         GenerateAlertJob::dispatch($drone->id, $this->telemetryData);
     }
