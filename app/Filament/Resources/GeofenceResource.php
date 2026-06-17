@@ -19,7 +19,7 @@ class GeofenceResource extends Resource
 {
     protected static ?string $model = Geofence::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-map';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-map';
 
     protected static ?string $navigationLabel = 'Geofences';
 
