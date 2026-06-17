@@ -26,8 +26,6 @@ services:
       REVERB_APP_SECRET: ${REVERB_APP_SECRET:-drone-monitoring-secret}
     volumes:
       - .:/var/www/html
-      - /var/www/html/vendor
-      - /var/www/html/node_modules
     depends_on:
       db:
         condition: service_healthy
@@ -107,8 +105,6 @@ services:
       REVERB_APP_SECRET: ${REVERB_APP_SECRET:-drone-monitoring-secret}
     volumes:
       - .:/var/www/html
-      - /var/www/html/vendor
-      - /var/www/html/node_modules
     ports:
       - "8080:8080"
     depends_on:
