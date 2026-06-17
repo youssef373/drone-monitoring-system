@@ -19,7 +19,7 @@ class TelemetryResource extends Resource
 {
     protected static ?string $model = TelemetryRecord::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?string $navigationLabel = 'Telemetry';
 
