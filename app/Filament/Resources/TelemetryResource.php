@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\TelemetryResource\Pages;
 use App\Models\Drone;
 use App\Models\TelemetryRecord;
+use Filament\Forms\Components\DatePicker;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -70,8 +71,8 @@ class TelemetryResource extends Resource
 
                 Filter::make('recorded_at')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('from')->label('From'),
-                        \Filament\Forms\Components\DatePicker::make('until')->label('Until'),
+                        DatePicker::make('from')->label('From'),
+                        DatePicker::make('until')->label('Until'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

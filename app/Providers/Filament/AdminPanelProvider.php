@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use App\Filament\Resources\AlertResource;
-use App\Filament\Resources\DroneResource;
-use App\Filament\Resources\GeofenceResource;
-use App\Filament\Resources\TelemetryResource;
 use App\Filament\Widgets\ActiveAlerts;
 use App\Filament\Widgets\StatsOverview;
 use Filament\Http\Middleware\Authenticate;

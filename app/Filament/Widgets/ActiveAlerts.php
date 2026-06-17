@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Enums\AlertSeverity;
-use App\Filament\Resources\AlertResource;
 use App\Models\Alert;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
