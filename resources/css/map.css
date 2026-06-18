@@ -1,0 +1,107 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/* --------------------------------------------------------------------------
+   Design tokens — AeroGuard dark palette (Material You)
+   -------------------------------------------------------------------------- */
+@theme {
+    /* Fonts */
+    --font-sans:  'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono:  'JetBrains Mono', 'Courier New', monospace;
+
+    /* Color palette */
+    --color-surface:                  #10131a;
+    --color-surface-container:        #1d2027;
+    --color-surface-container-high:   #272a31;
+    --color-surface-container-highest:#32353c;
+    --color-surface-variant:          #32353c;
+    --color-surface-bright:           #363941;
+    --color-on-surface:               #e1e2ec;
+    --color-on-surface-variant:       #c2c6d6;
+    --color-primary:                  #adc6ff;
+    --color-on-primary:               #002e6a;
+    --color-primary-container:        #4d8eff;
+    --color-secondary:                #bcc7de;
+    --color-secondary-container:      #3e495d;
+    --color-on-secondary-container:   #aeb9d0;
+    --color-tertiary:                 #bec6e0;
+    --color-error:                    #ffb4ab;
+    --color-on-error:                 #690005;
+    --color-error-container:          #93000a;
+    --color-on-error-container:       #ffdad6;
+    --color-outline:                  #8c909f;
+    --color-outline-variant:          #424754;
+
+    /* Status colours (for JS-rendered DivIcons — also usable as utilities) */
+    --color-status-active:      #22c55e;
+    --color-status-inactive:    #6b7280;
+    --color-status-maintenance: #eab308;
+    --color-status-emergency:   #ef4444;
+
+    /* Sidebar width token */
+    --spacing-sidebar: 320px;
+}
+
+/* --------------------------------------------------------------------------
+   Sidebar slide transition (used alongside Tailwind translate utilities)
+   -------------------------------------------------------------------------- */
+.sidebar-transition {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bottom-sheet-transition {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --------------------------------------------------------------------------
+   Leaflet map container — fills its parent absolutely
+   -------------------------------------------------------------------------- */
+#map-container {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+/* Dark-mode tile filter: desaturate & darken OSM tiles */
+#map-container .leaflet-tile {
+    filter: brightness(0.42) saturate(0.55) hue-rotate(200deg);
+}
+
+/* Hide default Leaflet zoom/attribution controls (we use our own HUD) */
+#map-container .leaflet-control-container {
+    display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Drone marker — rendered as Leaflet DivIcon HTML by map.js
+   The outer .drone-marker class is set via L.divIcon({ className })
+   -------------------------------------------------------------------------- */
+.drone-marker {
+    background: transparent !important;
+    border: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   Keyframe animations (cannot be expressed as Tailwind utilities)
+   -------------------------------------------------------------------------- */
+@keyframes drone-ping {
+    75%, 100% { transform: scale(2.2); opacity: 0; }
+}
+
+@keyframes drone-emergency-pulse {
+    0%, 100% { transform: scale(1);   opacity: 1; }
+    50%       { transform: scale(1.4); opacity: 0.5; }
+}
+
+.animate-drone-ping {
+    animation: drone-ping 1.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-drone-emergency {
+    animation: drone-emergency-pulse 1s ease-in-out infinite;
+}
