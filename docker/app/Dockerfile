@@ -56,8 +56,8 @@ RUN composer install \
 # Copy full application source
 COPY . .
 
-# Generate optimised autoloader
-RUN composer dump-autoload --no-dev --optimize
+# Generate optimised autoloader (no scripts — APP_KEY not available at build time)
+RUN composer dump-autoload --no-dev --optimize --no-scripts
 
 # Install Node dependencies and build assets
 RUN npm ci && npm run build
