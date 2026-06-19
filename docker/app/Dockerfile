@@ -117,6 +117,29 @@ RUN apk add --no-cache --virtual .build-deps \
 # Copy PHP config
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/99-custom.ini
 
+# =============================================================================
+# Stage 3: test — runs unit tests and lint (optional, can be enabled in CI)
+# =============================================================================
+FROM production AS test
+
+# Install dev dependencies for testing
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+
+# Set up test environment
+COPY .env.testing .env
+RUN php artisan key:generate --env=testing
+
+# Run code style check (Pint)
+RUN vendor/bin/pint --test
+
+# Run unit tests
+RUN php artisan test --parallel
+
+# =============================================================================
+# Stage 4: production-final — copy from test stage if tests pass
+# =============================================================================
+FROM production AS production-final
+
 # Copy Supervisor config
 COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
