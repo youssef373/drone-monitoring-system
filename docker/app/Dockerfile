@@ -56,8 +56,8 @@ RUN composer install \
 # Copy full application source
 COPY . .
 
-# Generate optimised autoloader
-RUN composer dump-autoload --no-dev --optimize
+# Generate optimised autoloader (no scripts — APP_KEY not available at build time)
+RUN composer dump-autoload --no-dev --optimize --no-scripts
 
 # Install Node dependencies and build assets
 RUN npm ci && npm run build
@@ -116,6 +116,29 @@ RUN apk add --no-cache --virtual .build-deps \
 
 # Copy PHP config
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/99-custom.ini
+
+# =============================================================================
+# Stage 3: test — runs unit tests and lint (optional, can be enabled in CI)
+# =============================================================================
+FROM production AS test
+
+# Install dev dependencies for testing
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+
+# Set up test environment
+COPY .env.testing .env
+RUN php artisan key:generate --env=testing
+
+# Run code style check (Pint)
+RUN vendor/bin/pint --test
+
+# Run unit tests
+RUN php artisan test --parallel
+
+# =============================================================================
+# Stage 4: production-final — copy from test stage if tests pass
+# =============================================================================
+FROM production AS production-final
 
 # Copy Supervisor config
 COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
