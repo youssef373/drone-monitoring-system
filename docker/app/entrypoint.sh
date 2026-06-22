@@ -10,6 +10,9 @@ chown -R www-data:www-data storage bootstrap/cache
 echo "[entrypoint] Running database migrations..."
 php artisan migrate --force
 
+echo "[entrypoint] Publishing all package public assets..."
+php artisan vendor:publish --tag=laravel-assets --ansi --force
+
 echo "[entrypoint] Caching config so php-fpm reads APP_KEY from cached config..."
 php artisan config:clear
 php artisan config:cache
