@@ -166,10 +166,11 @@ class SimulateTelemetryCommand extends Command
      * Adjusts heading and speed, moves the drone, drains battery, and
      * sets an emergency status when the battery drops below 10%.
      *
-     * @param SimulatedDrone $drone The drone state object
-     * @param float $baseLat Base latitude for boundary clamping
-     * @param float $baseLng Base longitude for boundary clamping
-     * @param float $batteryDrain Battery percentage drained per update
+     * @param  SimulatedDrone  $drone  The drone state object
+     * @param  float  $baseLat  Base latitude for boundary clamping
+     * @param  float  $baseLng  Base longitude for boundary clamping
+     * @param  float  $batteryDrain  Battery percentage drained per update
+     *
      * @throws RandomException
      */
     private function updateDroneState(SimulatedDrone $drone, float $baseLat, float $baseLng, float $batteryDrain): void
@@ -188,7 +189,8 @@ class SimulateTelemetryCommand extends Command
      * Logs a warning if the API responds with a non-2xx status or if the
      * request fails entirely.
      *
-     * @param SimulatedDrone $drone The drone to send telemetry for
+     * @param  SimulatedDrone  $drone  The drone to send telemetry for
+     *
      * @throws RandomException
      */
     private function sendTelemetry(SimulatedDrone $drone): void
@@ -261,8 +263,9 @@ class SimulateTelemetryCommand extends Command
     /**
      * Generate a new heading near the current heading.
      *
-     * @param float $currentHeading The current heading in degrees
+     * @param  float  $currentHeading  The current heading in degrees
      * @return float The new heading in degrees (0-360)
+     *
      * @throws RandomException
      */
     private function randomHeading(float $currentHeading): float
@@ -274,6 +277,7 @@ class SimulateTelemetryCommand extends Command
      * Generate a random speed for the drone.
      *
      * @return float The speed in meters per second
+     *
      * @throws RandomException
      */
     private function randomSpeed(): float

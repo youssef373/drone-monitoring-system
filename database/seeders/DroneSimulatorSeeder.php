@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Geofence;
-use App\Models\Drone;
 use App\Enums\DroneStatus;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Drone;
+use App\Models\Geofence;
 use Illuminate\Database\Seeder;
 
 class DroneSimulatorSeeder extends Seeder
@@ -39,6 +38,6 @@ class DroneSimulatorSeeder extends Seeder
         }
 
         $this->command->info("Geofence ID: {$g->id}");
-        $this->command->info("Drones created: " . Drone::count());
+        $this->command->info('Drones created: '.Drone::count());
     }
 }

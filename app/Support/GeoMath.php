@@ -26,11 +26,11 @@ final class GeoMath
      * delta is adjusted by the cosine of the latitude to account for
      * meridian convergence.
      *
-     * @param float $lat Starting latitude in degrees
-     * @param float $lng Starting longitude in degrees
-     * @param float $heading Direction of travel in degrees (0-360)
-     * @param float $speed Speed in meters per second
-     * @param int $interval Time traveled in seconds
+     * @param  float  $lat  Starting latitude in degrees
+     * @param  float  $lng  Starting longitude in degrees
+     * @param  float  $heading  Direction of travel in degrees (0-360)
+     * @param  float  $speed  Speed in meters per second
+     * @param  int  $interval  Time traveled in seconds
      * @return array{0: float, 1: float} New [latitude, longitude]
      */
     public static function move(float $lat, float $lng, float $heading, float $speed, int $interval): array
@@ -50,10 +50,10 @@ final class GeoMath
      *
      * Keeps simulated drones from drifting too far away during long runs.
      *
-     * @param float $lat Latitude to clamp
-     * @param float $lng Longitude to clamp
-     * @param float $baseLat Center latitude of the boundary box
-     * @param float $baseLng Center longitude of the boundary box
+     * @param  float  $lat  Latitude to clamp
+     * @param  float  $lng  Longitude to clamp
+     * @param  float  $baseLat  Center latitude of the boundary box
+     * @param  float  $baseLng  Center longitude of the boundary box
      * @return array{0: float, 1: float} Clamped [latitude, longitude]
      */
     public static function clampToBounds(float $lat, float $lng, float $baseLat, float $baseLng): array

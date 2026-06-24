@@ -74,7 +74,7 @@ class SimulateTelemetryCommandTest extends TestCase
             '--interval' => 60,
         ])
             ->expectsOutputToContain("Drone {$d1->id}:")
-            ->expectsOutputToContain("Drone") // generic check for others
+            ->expectsOutputToContain('Drone') // generic check for others
             ->assertSuccessful();
 
         $this->assertDatabaseCount('drones', 3);
