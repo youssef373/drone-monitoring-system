@@ -1,6 +1,19 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
+// Inject alert pulse animation CSS
+if (typeof document !== 'undefined' && !document.getElementById('drone-marker-styles')) {
+    const style = document.createElement('style');
+    style.id = 'drone-marker-styles';
+    style.textContent = `
+        @keyframes drone-alert-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
 // Drone status color mapping
 const STATUS_COLORS = {
     active: '#22c55e',
@@ -41,31 +54,129 @@ export function getMap() {
 }
 
 /**
- * Create a custom drone marker icon with status color and battery indicator
+ * Alert type visual configuration: icon SVG path + color + label.
+ * Each alert type renders a distinct icon on the drone marker badge.
+ */
+const ALERT_TYPE_CONFIG = {
+    geofence_violation: {
+        color: '#ef4444',
+        icon: '<path d="M12 2L3 7v6c0 5 3.8 9.7 9 11 5.2-1.3 9-6 9-11V7l-9-5z"/><path d="M12 7v5"/><path d="M12 16h.01" stroke-width="2.5"/>',
+        label: 'Geofence Violation',
+    },
+    critical_battery: {
+        color: '#ef4444',
+        icon: '<rect x="2" y="7" width="16" height="10" rx="2"/><line x1="22" y1="11" x2="22" y2="13" stroke-width="3"/><path d="M10 10v3" stroke-width="2.5"/><path d="M10 15h.01" stroke-width="2.5"/>',
+        label: 'Critical Battery',
+    },
+    low_battery: {
+        color: '#eab308',
+        icon: '<rect x="2" y="7" width="16" height="10" rx="2"/><line x1="22" y1="11" x2="22" y2="13" stroke-width="3"/><path d="M7 12h3" stroke-width="2.5"/>',
+        label: 'Low Battery',
+    },
+    signal_loss: {
+        color: '#ef4444',
+        icon: '<path d="M2 8a14 14 0 0 1 20 0" stroke-width="2"/><path d="M5 11a10 10 0 0 1 14 0" stroke-width="2"/><line x1="12" y1="16" x2="12" y2="16" stroke-width="3" stroke-linecap="round"/><line x1="3" y1="3" x2="21" y2="21" stroke-width="2.5"/>',
+        label: 'Signal Loss',
+    },
+    emergency: {
+        color: '#ef4444',
+        icon: '<path d="M12 2v6m0 8v6M2 12h6m8 0h6" stroke-width="2.5"/><circle cx="12" cy="12" r="3"/>',
+        label: 'Emergency',
+    },
+};
+
+/**
+ * Build a single alert badge SVG for a given alert type.
+ * @param {Object} alert - {type, severity, message}
+ * @param {number} offset - vertical offset (px) for stacking multiple badges
+ * @returns {string} HTML string for the badge
+ */
+function buildAlertBadge(alert, offset) {
+    const cfg = ALERT_TYPE_CONFIG[alert.type] || {
+        color: alert.severity === 'critical' ? '#ef4444' : '#eab308',
+        icon: '<path d="M12 9v4"/><path d="M12 17h.01"/>',
+        label: alert.type,
+    };
+    const isCritical = alert.severity === 'critical';
+    const pulse = isCritical ? 'animation: drone-alert-pulse 1s ease-in-out infinite;' : '';
+
+    return `
+        <div title="${cfg.label}: ${alert.message || ''}"
+             style="
+            position: absolute;
+            top: ${offset}px;
+            right: -8px;
+            width: 18px;
+            height: 18px;
+            background: ${cfg.color};
+            border: 2px solid #10131a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            ${pulse}
+            z-index: 10;
+        ">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                ${cfg.icon}
+            </svg>
+        </div>`;
+}
+
+/**
+ * Create a custom drone marker icon (quadcopter shape) with status color,
+ * battery indicator, and type-specific alert badges if the drone has active alerts.
  * @param {string} status - Drone status
  * @param {number} battery - Battery level percentage
+ * @param {Array}  alerts - Active alerts array [{type, severity, message}, ...]
  */
-function createDroneIcon(status, battery) {
+function createDroneIcon(status, battery, alerts = []) {
     const color = STATUS_COLORS[status] || STATUS_COLORS.inactive;
     const batteryWidth = Math.max(0, Math.min(100, battery));
     const batteryColor = batteryWidth < 25 ? '#ef4444' : batteryWidth < 50 ? '#eab308' : '#22c55e';
 
+    // Deduplicate by type so we show one badge per alert type (not per alert)
+    const seenTypes = new Set();
+    const uniqueAlerts = (alerts || []).filter(a => {
+        if (seenTypes.has(a.type)) return false;
+        seenTypes.add(a.type);
+        return true;
+    });
+
+    // Stack badges vertically above the marker (each badge is 18px + 4px gap)
+    const alertBadges = uniqueAlerts.map((a, i) => buildAlertBadge(a, -8 - i * 22)).join('');
+
     return L.divIcon({
         className: 'drone-marker',
         html: `
-            <div style="position: relative; text-align: center;">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                    <path d="M2 17l10 5 10-5"/>
-                    <path d="M2 12l10 5 10-5"/>
-                    <line x1="12" y1="12" x2="12" y2="2"/>
+            <div style="position: relative; text-align: center; width: 40px;">
+                ${alertBadges}
+                <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Quadcopter arms (X-frame) -->
+                    <line x1="8" y1="8" x2="40" y2="40" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+                    <line x1="40" y1="8" x2="8" y2="40" stroke="${color}" stroke-width="2.5" stroke-linecap="round"/>
+                    <!-- Rotors (4 propeller circles) -->
+                    <circle cx="8" cy="8" r="5" fill="${color}" fill-opacity="0.15" stroke="${color}" stroke-width="1.5"/>
+                    <circle cx="40" cy="8" r="5" fill="${color}" fill-opacity="0.15" stroke="${color}" stroke-width="1.5"/>
+                    <circle cx="8" cy="40" r="5" fill="${color}" fill-opacity="0.15" stroke="${color}" stroke-width="1.5"/>
+                    <circle cx="40" cy="40" r="5" fill="${color}" fill-opacity="0.15" stroke="${color}" stroke-width="1.5"/>
+                    <!-- Propeller blades -->
+                    <line x1="5" y1="8" x2="11" y2="8" stroke="${color}" stroke-width="1" stroke-opacity="0.6"/>
+                    <line x1="37" y1="8" x2="43" y2="8" stroke="${color}" stroke-width="1" stroke-opacity="0.6"/>
+                    <line x1="5" y1="40" x2="11" y2="40" stroke="${color}" stroke-width="1" stroke-opacity="0.6"/>
+                    <line x1="37" y1="40" x2="43" y2="40" stroke="${color}" stroke-width="1" stroke-opacity="0.6"/>
+                    <!-- Central body -->
+                    <rect x="18" y="18" width="12" height="12" rx="3" fill="${color}" stroke="#10131a" stroke-width="1"/>
+                    <!-- Camera lens -->
+                    <circle cx="24" cy="24" r="2.5" fill="#10131a" stroke="#fff" stroke-width="0.5"/>
                 </svg>
                 <div style="
-                    width: 28px;
+                    width: 32px;
                     height: 4px;
                     background: #e5e7eb;
                     border-radius: 2px;
-                    margin-top: 2px;
+                    margin: -2px auto 0;
                     position: relative;
                     overflow: hidden;
                 ">
@@ -78,9 +189,9 @@ function createDroneIcon(status, battery) {
                 </div>
             </div>
         `,
-        iconSize: [32, 40],
-        iconAnchor: [16, 20],
-        popupAnchor: [0, -20],
+        iconSize: [40, 48],
+        iconAnchor: [20, 24],
+        popupAnchor: [0, -24],
     });
 }
 
@@ -101,16 +212,22 @@ export function addDroneMarker(drone) {
         return;
     }
 
-    const lat = drone.lat ?? 0;
-    const lng = drone.lng ?? 0;
-    const hasPosition = drone.lat !== null && drone.lng !== null;
+    // Skip rendering if the drone has no position (FR-014, edge case)
+    if (drone.lat === null || drone.lng === null ||
+        drone.lat === undefined || drone.lng === undefined) {
+        return;
+    }
+
+    const lat = drone.lat;
+    const lng = drone.lng;
+    const hasPosition = true;
 
     // Remove existing marker if present
     if (markers[drone.id]) {
         map.removeLayer(markers[drone.id]);
     }
 
-    const icon = createDroneIcon(drone.status, drone.battery ?? 0);
+    const icon = createDroneIcon(drone.status, drone.battery ?? 0, drone.alerts || []);
     const marker = L.marker([lat, lng], { icon }).addTo(map);
 
     // Build popup content
@@ -129,7 +246,9 @@ export function addDroneMarker(drone) {
 
     marker.bindPopup(popupContent);
 
-    // Store marker reference
+    // Store marker reference with drone metadata for popup rebuilding
+    marker._droneId = drone.id;
+    marker._droneName = drone.name;
     markers[drone.id] = marker;
 
     return marker;
@@ -142,8 +261,9 @@ export function addDroneMarker(drone) {
  * @param {number} lng - New longitude
  * @param {string|null} status - Optional new status
  * @param {number|null} battery - Optional new battery level
+ * @param {Array|null} alerts - Optional active alerts array
  */
-export function updateDronePosition(droneId, lat, lng, status = null, battery = null) {
+export function updateDronePosition(droneId, lat, lng, status = null, battery = null, alerts = null) {
     if (!markers[droneId]) {
         console.warn(`Marker for drone ${droneId} not found`);
         return false;
@@ -152,17 +272,29 @@ export function updateDronePosition(droneId, lat, lng, status = null, battery = 
     const marker = markers[droneId];
     marker.setLatLng([lat, lng]);
 
-    // Update icon if status or battery changed
-    if (status !== null || battery !== null) {
+    // Update icon if status, battery, or alerts changed
+    if (status !== null || battery !== null || alerts !== null) {
         const currentStatus = status || 'inactive';
         const currentBattery = battery || 0;
-        marker.setIcon(createDroneIcon(currentStatus, currentBattery));
+        const currentAlerts = alerts || [];
+        marker.setIcon(createDroneIcon(currentStatus, currentBattery, currentAlerts));
     }
 
-    // Update popup content if open
-    if (marker.isPopupOpen()) {
-        marker.setPopupContent(marker.getPopup().getContent());
-    }
+    // Rebuild popup with updated data
+    const droneName = marker._droneName || '';
+    const displayStatus = status || 'inactive';
+    const displayBattery = battery ?? 'N/A';
+    const updatedPopup = `
+        <div class="drone-popup">
+            <h3 class="font-semibold text-gray-900">${droneName}</h3>
+            <p class="text-sm text-gray-600">Status: <span class="capitalize" style="color: ${STATUS_COLORS[displayStatus] || STATUS_COLORS.inactive}">${displayStatus}</span></p>
+            <p class="text-sm text-gray-600">Battery: ${displayBattery}%</p>
+            <p class="text-sm text-gray-600">Lat: ${lat.toFixed(6)}</p>
+            <p class="text-sm text-gray-600">Lng: ${lng.toFixed(6)}</p>
+            <a href="/map/${droneId}" class="text-sm text-blue-600 hover:underline">View Details &rarr;</a>
+        </div>
+    `;
+    marker.setPopupContent(updatedPopup);
 
     // If follow mode is enabled, pan map to this marker
     if (followMode && window.focusedDroneId === droneId) {
@@ -253,6 +385,22 @@ export function setFocusedDrone(droneId) {
 }
 
 /**
+ * Center the map on the focused drone marker
+ * Reads window.focusedDroneId to determine which marker to center on.
+ */
+export function centerOnFocused() {
+    if (!map || !window.focusedDroneId) {
+        return;
+    }
+
+    const marker = markers[window.focusedDroneId];
+    if (marker) {
+        const latLng = marker.getLatLng();
+        map.setView(latLng, Math.max(map.getZoom(), 15));
+    }
+}
+
+/**
  * Toggle follow mode
  * @param {boolean} enabled - Whether to enable follow mode
  */
@@ -314,7 +462,7 @@ export function subscribeToDroneUpdates(droneId, onUpdate = null) {
         return;
     }
 
-    window.Echo.private(`drone.${droneId}`)
+    window.Echo.channel(`drone.${droneId}`)
         .listen('.telemetry.updated', (event) => {
             console.log('Telemetry update received:', event);
 
@@ -324,7 +472,8 @@ export function subscribeToDroneUpdates(droneId, onUpdate = null) {
                 event.latitude,
                 event.longitude,
                 event.status,
-                event.battery_level
+                event.battery_level,
+                event.active_alerts || []
             );
 
             // Update trail if in single drone view
@@ -376,48 +525,65 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // Read bootstrap data from window.mapConfig (set by Blade templates)
+    const config = window.mapConfig || {};
+    const dronesData = config.dronesData || [];
+    const geofencesData = config.geofencesData || [];
+    const trailData = config.trailData || [];
+    const focusedDroneId = config.focusedDroneId;
+    const singleDrone = config.drone;
+
+    // In single-drone mode, build a dronesData array from the single drone object
+    // so addDroneMarker and subscribeToAllDrones work uniformly
+    const allDrones = config.mode === 'single'
+        ? (singleDrone ? [singleDrone] : [])
+        : dronesData;
+
     // Initialize map
     const initialCenter = window.initialMapCenter || [0, 0];
     const initialZoom = window.initialMapZoom || 13;
     initMap('map-container', initialCenter, initialZoom);
 
-    // Load drones data if available
-    if (window.dronesData && Array.isArray(window.dronesData)) {
-        window.dronesData.forEach(drone => {
-            addDroneMarker(drone);
-        });
+    // Expose map instance and action functions to window for page-level scripts
+    // (map-index.js and map-show.js reference these via window.*)
+    window.mapInstance = map;
+    window.fitAllDrones = centerOnDrones;
+    window.centerOnFocused = centerOnFocused;
+    window.setFollowMode = setFollowMode;
 
-        // Center on drones if multiple, or set view for single
-        if (window.dronesData.length > 1) {
-            centerOnDrones();
-        } else if (window.dronesData.length === 1) {
-            const drone = window.dronesData[0];
-            if (drone.lat && drone.lng) {
-                map.setView([drone.lat, drone.lng], 15);
-            }
+    // Load drones data
+    allDrones.forEach(drone => {
+        addDroneMarker(drone);
+    });
+
+    // Center on drones if multiple, or set view for single
+    if (allDrones.length > 1) {
+        centerOnDrones();
+    } else if (allDrones.length === 1) {
+        const drone = allDrones[0];
+        if (drone.lat && drone.lng) {
+            map.setView([drone.lat, drone.lng], 15);
         }
     }
 
     // Load geofences if available
-    if (window.geofencesData && Array.isArray(window.geofencesData)) {
-        window.geofencesData.forEach(geofence => {
-            addGeofence(geofence);
-        });
-    }
+    geofencesData.forEach(geofence => {
+        addGeofence(geofence);
+    });
 
     // Initialize trail if in single drone view
-    if (window.trailData && Array.isArray(window.trailData)) {
-        initTrail(window.trailData);
+    if (trailData.length > 0) {
+        initTrail(trailData);
     }
 
     // Set focused drone if in single view
-    if (window.focusedDroneId) {
-        setFocusedDrone(window.focusedDroneId);
+    if (focusedDroneId) {
+        setFocusedDrone(focusedDroneId);
     }
 
     // Subscribe to WebSocket updates
-    if (window.dronesData && Array.isArray(window.dronesData)) {
-        const droneIds = window.dronesData.map(d => d.id);
+    if (allDrones.length > 0) {
+        const droneIds = allDrones.map(d => d.id);
         subscribeToAllDrones(droneIds);
     }
 });
@@ -431,6 +597,7 @@ export default {
     removeDroneMarker,
     addGeofence,
     centerOnDrones,
+    centerOnFocused,
     setFocusedDrone,
     setFollowMode,
     initTrail,

@@ -8,7 +8,7 @@ use App\Events\TelemetryUpdated;
 use App\Jobs\ProcessTelemetryJob;
 use App\Models\Drone;
 use App\Models\TelemetryRecord;
-use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
@@ -25,8 +25,8 @@ class TelemetryUpdatedTest extends TestCase
         $event = new TelemetryUpdated($drone, $record);
         $channel = $event->broadcastOn();
 
-        $this->assertInstanceOf(PrivateChannel::class, $channel);
-        $this->assertEquals('private-drone.'.$drone->id, $channel->name);
+        $this->assertInstanceOf(Channel::class, $channel);
+        $this->assertEquals('drone.'.$drone->id, $channel->name);
     }
 
     public function test_event_payload_contains_correct_data(): void
@@ -49,6 +49,10 @@ class TelemetryUpdatedTest extends TestCase
         $this->assertEquals(-74.0060, $payload['longitude']);
         $this->assertEquals(75, $payload['battery_level']);
         $this->assertArrayHasKey('recorded_at', $payload);
+        $this->assertArrayHasKey('active_alerts', $payload);
+        $this->assertIsArray($payload['active_alerts']);
+        $this->assertArrayHasKey('status', $payload);
+        $this->assertIsString($payload['status']);
     }
 
     public function test_event_has_correct_broadcast_name(): void

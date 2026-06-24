@@ -15,7 +15,7 @@ class MapController extends Controller
      */
     public function index(): View
     {
-        $drones = Drone::with('geofence')->get();
+        $drones = Drone::with(['geofence', 'alerts' => fn ($q) => $q->whereNull('resolved_at')])->get();
         $geofences = Geofence::all();
 
         return view('map.index', compact('drones', 'geofences'));
@@ -26,17 +26,16 @@ class MapController extends Controller
      */
     public function show(Drone $drone): View
     {
-        $drone->load('geofence');
+        $drone->load(['geofence', 'alerts' => fn ($q) => $q->whereNull('resolved_at')]);
 
         $recentTelemetry = $drone->telemetryRecords()
             ->recent()
             ->limit(50)
             ->get(['latitude', 'longitude', 'altitude', 'battery_level', 'recorded_at']);
 
-        $activeAlerts = $drone->alerts()
-            ->whereNull('resolved_at')
-            ->latest()
-            ->get();
+        $activeAlerts = $drone->alerts
+            ->sortByDesc('created_at')
+            ->values();
 
         return view('map.show', compact('drone', 'recentTelemetry', 'activeAlerts'));
     }

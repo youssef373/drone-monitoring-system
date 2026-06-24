@@ -12,8 +12,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 
-    {{-- Vite: map CSS (includes Tailwind + Leaflet CSS), shared map JS, layout JS --}}
-    @vite(['resources/js/map.js', 'resources/js/map-layout.js'])
+    {{-- Vite: map CSS (Tailwind + Leaflet CSS), Echo/WebSocket client, shared map JS, layout JS --}}
+    @vite(['resources/css/map.css', 'resources/js/bootstrap.js', 'resources/js/map.js', 'resources/js/map-layout.js'])
+
 
     <style>
         /* Prevent any scroll; map fills viewport */

@@ -201,6 +201,11 @@ $dronesData = $drones->map(fn ($d) => [
         'center_lng'    => $d->geofence->center_lng !== null ? (float) $d->geofence->center_lng : null,
         'radius_meters' => $d->geofence->radius_meters !== null ? (float) $d->geofence->radius_meters : null,
     ] : null,
+    'alerts'   => $d->alerts->whereNull('resolved_at')->values()->map(fn ($a) => [
+        'type'     => $a->type->value,
+        'severity' => $a->severity->value,
+        'message'  => $a->message,
+    ])->toArray(),
 ])->toArray();
 
 $geofencesData = $geofences->map(fn ($g) => [

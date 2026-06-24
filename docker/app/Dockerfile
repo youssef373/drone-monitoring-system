@@ -56,11 +56,22 @@ RUN composer install \
 # Copy full application source
 COPY . .
 
+# Create a .env file with VITE_ variables for the Vite build stage
+# (.env is excluded by .dockerignore for security, but VITE_ vars are public)
+RUN printf 'VITE_APP_NAME="Drone Monitoring System"\nVITE_REVERB_APP_KEY="%s"\nVITE_REVERB_HOST="%s"\nVITE_REVERB_PORT="%s"\nVITE_REVERB_SCHEME="%s"\n' \
+    "${VITE_REVERB_APP_KEY:-5erlhrx4xfhry1xdeqzs}" \
+    "${VITE_REVERB_HOST:-localhost}" \
+    "${VITE_REVERB_PORT:-8081}" \
+    "${VITE_REVERB_SCHEME:-http}" > .env
+
 # Generate optimised autoloader (no scripts — APP_KEY not available at build time)
 RUN composer dump-autoload --no-dev --optimize --no-scripts
 
 # Install Node dependencies and build assets
 RUN npm ci && npm run build
+
+# Publish all package public assets (Filament, Livewire, etc.) into public/
+RUN php artisan vendor:publish --tag=laravel-assets --ansi --force
 
 # =============================================================================
 # Stage 2: production — minimal runtime image

@@ -338,6 +338,11 @@ $droneData = [
         'center_lng'    => $drone->geofence->center_lng !== null ? (float) $drone->geofence->center_lng : null,
         'radius_meters' => $drone->geofence->radius_meters !== null ? (float) $drone->geofence->radius_meters : null,
     ] : null,
+    'alerts'   => $activeAlerts->map(fn ($a) => [
+        'type'     => $a->type->value,
+        'severity' => $a->severity->value,
+        'message'  => $a->message,
+    ])->values()->toArray(),
 ];
 
 $trailData = $recentTelemetry->map(fn ($t) => [

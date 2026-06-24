@@ -41,16 +41,23 @@ class GenerateAlertJob implements ShouldQueue
         } elseif ($battery < 25) {
             $this->createAlertIfNone($drone->id, AlertType::LOW_BATTERY, AlertSeverity::WARNING,
                 "Low battery level: {$battery}%");
+        } else {
+            $this->resolveAlertsOfType($drone->id, AlertType::LOW_BATTERY);
+            $this->resolveAlertsOfType($drone->id, AlertType::CRITICAL_BATTERY);
         }
 
         if ($signal === 0) {
             $this->createAlertIfNone($drone->id, AlertType::SIGNAL_LOSS, AlertSeverity::WARNING,
                 'Signal lost (strength: 0)');
+        } elseif ($signal !== null && $signal > 0) {
+            $this->resolveAlertsOfType($drone->id, AlertType::SIGNAL_LOSS);
         }
 
         if ($drone->geofence && ! $drone->geofence->containsPoint($lat, $lng)) {
             $this->createAlertIfNone($drone->id, AlertType::GEOFENCE_VIOLATION, AlertSeverity::CRITICAL,
                 "Drone outside geofence [{$drone->geofence->name}]");
+        } elseif ($drone->geofence && $drone->geofence->containsPoint($lat, $lng)) {
+            $this->resolveAlertsOfType($drone->id, AlertType::GEOFENCE_VIOLATION);
         }
     }
 
@@ -69,5 +76,13 @@ class GenerateAlertJob implements ShouldQueue
                 'message' => $message,
             ]);
         }
+    }
+
+    private function resolveAlertsOfType(int $droneId, AlertType $type): void
+    {
+        Alert::where('drone_id', $droneId)
+            ->where('type', $type)
+            ->whereNull('resolved_at')
+            ->update(['resolved_at' => now()]);
     }
 }

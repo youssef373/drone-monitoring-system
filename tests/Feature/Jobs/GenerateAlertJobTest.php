@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Jobs;
 
+use App\Enums\AlertSeverity;
 use App\Enums\AlertType;
 use App\Jobs\GenerateAlertJob;
+use App\Models\Alert;
 use App\Models\Drone;
 use App\Models\Geofence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -110,5 +112,81 @@ class GenerateAlertJobTest extends TestCase
         (new GenerateAlertJob($drone->id, $data))->handle();
 
         $this->assertDatabaseCount('alerts', 0);
+    }
+
+    public function test_resolves_geofence_violation_when_drone_returns_inside(): void
+    {
+        $geofence = Geofence::factory()->create([
+            'center_lat' => 40.0,
+            'center_lng' => -74.0,
+            'radius_meters' => 1000,
+        ]);
+
+        $drone = Drone::factory()->create(['geofence_id' => $geofence->id]);
+
+        Alert::create([
+            'drone_id' => $drone->id,
+            'type' => AlertType::GEOFENCE_VIOLATION,
+            'severity' => AlertSeverity::CRITICAL,
+            'message' => "Drone outside geofence [{$geofence->name}]",
+        ]);
+
+        $data = $this->telemetryData([
+            'drone_id' => $drone->id,
+            'latitude' => 40.0,
+            'longitude' => -74.0,
+        ]);
+
+        (new GenerateAlertJob($drone->id, $data))->handle();
+
+        $alert = Alert::where('drone_id', $drone->id)
+            ->where('type', AlertType::GEOFENCE_VIOLATION)
+            ->first();
+
+        $this->assertNotNull($alert->resolved_at);
+    }
+
+    public function test_resolves_low_battery_alert_when_battery_recovers(): void
+    {
+        $drone = Drone::factory()->create(['geofence_id' => null]);
+
+        Alert::create([
+            'drone_id' => $drone->id,
+            'type' => AlertType::LOW_BATTERY,
+            'severity' => AlertSeverity::WARNING,
+            'message' => 'Low battery level: 20%',
+        ]);
+
+        $data = $this->telemetryData(['drone_id' => $drone->id, 'battery_level' => 80]);
+
+        (new GenerateAlertJob($drone->id, $data))->handle();
+
+        $alert = Alert::where('drone_id', $drone->id)
+            ->where('type', AlertType::LOW_BATTERY)
+            ->first();
+
+        $this->assertNotNull($alert->resolved_at);
+    }
+
+    public function test_resolves_signal_loss_alert_when_signal_returns(): void
+    {
+        $drone = Drone::factory()->create(['geofence_id' => null]);
+
+        Alert::create([
+            'drone_id' => $drone->id,
+            'type' => AlertType::SIGNAL_LOSS,
+            'severity' => AlertSeverity::WARNING,
+            'message' => 'Signal lost (strength: 0)',
+        ]);
+
+        $data = $this->telemetryData(['drone_id' => $drone->id, 'signal_strength' => 50]);
+
+        (new GenerateAlertJob($drone->id, $data))->handle();
+
+        $alert = Alert::where('drone_id', $drone->id)
+            ->where('type', AlertType::SIGNAL_LOSS)
+            ->first();
+
+        $this->assertNotNull($alert->resolved_at);
     }
 }
